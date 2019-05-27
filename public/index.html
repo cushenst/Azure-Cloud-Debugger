@@ -45,10 +45,13 @@
 
 </div>
 <div class="container">
-    <div class="row col-sm-12 displaystyle-leftborder displaystyle-success displaystyle-lg" id="WelcomeBox">
+    <div class="row col-sm-12 displaystyle-leftborder displaystyle-info displaystyle-lg" id="WelcomeBox">
         <p id="WelcomeMessage">Please enter the connection Endpoint String.
-        <p hidden id="ConnectionMessage">Connection Successful. Waiting for messages.
     </div>
+    <div class="row col-sm-12 displaystyle-leftborder displaystyle-success displaystyle-lg" hidden id="ConnectionBox">
+        <p id="ConnectionMessage">Connection Successful. Waiting for messages.
+    </div>
+
     <div class="row col-sm-12 displaystyle-leftborder displaystyle-danger displaystyle-lg" hidden id="ErrorBox">
         <p>Error: Please re-enter the connection string or refresh your browser.</p>
     </div>
@@ -83,12 +86,12 @@
                 var json = JSON.parse(message.data);
                 console.log(json);
                 if (json.Connected === "True") {
-                    document.getElementById("ConnectionMessage").hidden = false;
+                    document.getElementById("ConnectionBox").hidden = false;
                 } else {
-                    document.getElementById("WelcomeBox").hidden = true;
+                    document.getElementById("ConnectionBox").hidden = true;
                     var messagesDiv = document.querySelector('.container');
                     messagesDiv.insertAdjacentHTML('afterbegin',
-                        '<div class="row col-sm-12 displaystyle-leftborder displaystyle-success displaystyle-lg">' +
+                        '<div class="row col-sm-12 displaystyle-leftborder displaystyle-info displaystyle-lg">' +
                         '<table><tr><th>Device:</th><td>' +
                         String(json.Device) +
                         '</td></tr><tr><th>Topic:</th><td>' +
@@ -109,6 +112,7 @@
                 document.getElementById("Topic").disabled = false;
                 document.getElementById("button").disabled = false;
                 document.getElementById("WelcomeBox").hidden = true;
+                document.getElementById("ConnectionBox").hidden = true;
                 document.getElementById("ErrorBox").hidden = false;
 
 
@@ -125,7 +129,7 @@
             console.log(msgJSON);
             connection.send(msgJSON);
             document.getElementById("ErrorBox").hidden = true;
-            document.getElementById("WelcomeBox").hidden = false;
+            document.getElementById("ConnectionBox").hidden = false;
             document.getElementById("Endpoint").disabled = true;
             document.getElementById("Endpoint").blur();
             document.getElementById("Device").disabled = true;
@@ -133,7 +137,7 @@
             document.getElementById("Topic").disabled = true;
             document.getElementById("Topic").blur();
             document.getElementById("button").disabled = true;
-            document.getElementById("WelcomeMessage").hidden = true;
+            document.getElementById("WelcomeBox").hidden = true;
 
         }
     });
