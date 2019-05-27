@@ -86,6 +86,10 @@ app.get("/", function (req, res) {
     res.sendFile(__dirname + "/public/" + "index.html");
 });
 
+app.get("/static/:page", function (req, res) {
+    res.sendFile(__dirname + "/public/" + req.params["page"]);
+});
+
 var server1 = app.listen(8080, function () {
     var host = server1.address().address;
     var port = server1.address().port;
