@@ -45,7 +45,12 @@ wsServer.on("request", function (request) {
             const firstPartitionId = allPartitionIds[2];
             const startTime = lastMessageTime;
             console.log("Device Connected");
+            var connected = false;
             const receiveHandler = client.receive(firstPartitionId, eventData => {
+                if (connected === false) {
+                    connection.send('{"Connected":"True"}');
+                    connected = true;
+                }
                 if (Math.floor((eventData.annotations["iothub-enqueuedtime"]) / 1000) > startTime &&
                     (eventData.annotations["iothub-connection-device-id"] === device || device === "") &&
                     (Object.keys(eventData._raw_amqp_mesage.application_properties)[0] === topic || topic === "")) {

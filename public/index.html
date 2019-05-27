@@ -2,37 +2,56 @@
 <html lang="en">
 <head>
 
-    <link rel="stylesheet" type="text/css" href="/static/index.css">
+
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport">
 
     <!-- Bootstrap CSS -->
-    <link crossorigin="anonymous" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" rel="stylesheet">
-
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/index.css" rel="stylesheet" type="text/css">
     <title>Azure IoT Hub Cloud Subscriber</title>
 </head>
 <body>
-<div style="text-align: center;"><h1>Azure IoT Hub Cloud Subscriber</h1>
-    <p>Azure Endpoint String:
-        <label for="Endpoint"></label><input id="Endpoint" size="30" type="text"/><br></p>
-    <p>Device to listen to messages from (optional):
-        <label for="Device"></label><input id="Device" size="30" type="text"/><br></p>
-    <p>Topic to subscribe to (optional):
-        <label for="Topic"></label><input id="Topic" size="30" type="text"/><br></p>
-    <button id="button">Submit</button>
-    <br>
-    <br>
-    <table id="Table_Messages" align="center">
+<header>
+    <nav class="navbar navbar-inverse">
+        <div class="container-fluid">
+            <div class="nav navbar-nav navbar-center">
+                <a class="navbar-brand" href="#">Azure IoT Hub Cloud Subscriber</a>
+            </div>
+        </div>
+    </nav>
+</header>
+
+<div style="text-align: center;">
+    <table align="center">
         <tr>
-            <th> Device</th>
-            <th> Topic</th>
-            <th> Message</th>
+            <th>Azure Endpoint String:</th>
+            <td><label for="Endpoint"></label><input id="Endpoint" size="30" type="text"/></td>
+        </tr>
+        <tr>
+            <th><h4>Device to listen to messages from (optional):</h4></th>
+            <td><label for="Device"></label><input id="Device" size="30" type="text"/></td>
         </tr>
 
+        <tr>
+            <th>Topic to subscribe to (optional):</th>
+            <td><label for="Topic"></label><input id="Topic" size="30" type="text"/></td>
+        </tr>
     </table>
+    <br>
+    <br>
+    <button id="button">Submit</button>
 
+</div>
+<div class="container">
+    <div class="row col-sm-12 displaystyle-leftborder displaystyle-success displaystyle-lg" id="WelcomeBox">
+        <p id="WelcomeMessage">Please enter the connection Endpoint String.
+        <p hidden id="ConnectionMessage">Connection Successful. Waiting for messages.
+    </div>
+    <div class="row col-sm-12 displaystyle-leftborder displaystyle-danger displaystyle-lg" hidden id="ErrorBox">
+        <p>Error: Please re-enter the connection string or refresh your browser.</p>
+    </div>
 </div>
 <!-- Optional JavaScript -->
 <!-- jQuery first, then Popper.js, then Bootstrap JS -->
@@ -63,20 +82,35 @@
             try {
                 var json = JSON.parse(message.data);
                 console.log(json);
-                var table = document.getElementById("Table_Messages");
-                var row = table.insertRow(1);
-                var cell1 = row.insertCell(0);
-                var cell2 = row.insertCell(1);
-                var cell3 = row.insertCell(2);
-                cell1.innerHTML = String(json.Device);
-                cell2.innerHTML = String(json.Topic);
-                cell3.innerHTML = String(json.Payload);
-                /*$("div").prepend(
+                if (json.Connected === "True") {
+                    document.getElementById("ConnectionMessage").hidden = false;
+                } else {
+                    document.getElementById("WelcomeBox").hidden = true;
+                    var messagesDiv = document.querySelector('.container');
+                    messagesDiv.insertAdjacentHTML('afterbegin',
+                        '<div class="row col-sm-12 displaystyle-leftborder displaystyle-success displaystyle-lg">' +
+                        '<table><tr><th>Device:</th><td>' +
+                        String(json.Device) +
+                        '</td></tr><tr><th>Topic:</th><td>' +
+                        String(json.Topic) +
+                        '</td></tr><tr><th>Message:</th><td>' +
+                        String(json.Payload) +
+                        '</td></tr></table></div>');
+
+                    /*$("div").prepend(
                     `<th><td> ${json.Device}</td><td>${json.Topic}</td><td>${json.Payload}</td></th>`
                     );*/
+                }
             } catch (e) {
                 console.log("This doesn\"t look like a valid JSON: ",
                     message.data);
+                document.getElementById("Endpoint").disabled = false;
+                document.getElementById("Device").disabled = false;
+                document.getElementById("Topic").disabled = false;
+                document.getElementById("button").disabled = false;
+                document.getElementById("WelcomeBox").hidden = true;
+                document.getElementById("ErrorBox").hidden = false;
+
 
             }
             // handle incoming message
@@ -90,6 +124,8 @@
             var msgJSON = JSON.stringify(msg);
             console.log(msgJSON);
             connection.send(msgJSON);
+            document.getElementById("ErrorBox").hidden = true;
+            document.getElementById("WelcomeBox").hidden = false;
             document.getElementById("Endpoint").disabled = true;
             document.getElementById("Endpoint").blur();
             document.getElementById("Device").disabled = true;
@@ -97,6 +133,8 @@
             document.getElementById("Topic").disabled = true;
             document.getElementById("Topic").blur();
             document.getElementById("button").disabled = true;
+            document.getElementById("WelcomeMessage").hidden = true;
+
         }
     });
 
