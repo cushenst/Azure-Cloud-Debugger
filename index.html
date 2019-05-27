@@ -1,0 +1,108 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport">
+
+    <!-- Bootstrap CSS -->
+    <link crossorigin="anonymous" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" rel="stylesheet">
+    <style>
+        table, td, th {
+            border: 2px solid black;
+        }
+    </style>
+    <title>Azure IoT Hub Cloud Subscriber</title>
+</head>
+<body>
+<div style="text-align: center;"><h1>Azure IoT Hub Cloud Subscriber</h1>
+    <p>Azure Endpoint String:
+        <label for="Endpoint"></label><input id="Endpoint" size="30" type="text"/><br></p>
+    <p>Device to listen to messages from (optional):
+        <label for="Device"></label><input id="Device" size="30" type="text"/><br></p>
+    <p>Topic to subscribe to (optional):
+        <label for="Topic"></label><input id="Topic" size="30" type="text"/><br></p>
+    <button id="button">Submit</button>
+    <br>
+    <table id="Table_Messages" align="center">
+        <tr>
+            <th> Device</th>
+            <th> Topic</th>
+            <th> Message</th>
+        </tr>
+
+    </table>
+
+</div>
+<!-- Optional JavaScript -->
+<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+<script crossorigin="anonymous"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+
+
+<script type="text/javascript">
+
+    $(function () {
+        // if user is running mozilla then use it"s built-in WebSocket
+        window.WebSocket = window.WebSocket || window.MozWebSocket;
+
+        var connection = new WebSocket("ws://127.0.0.1:1337");
+        connection.onopen = function () {
+            // connection is opened and ready to use
+        };
+
+        connection.onerror = function (error) {
+            // an error occurred when sending/receiving data
+        };
+
+        connection.onmessage = function (message) {
+            console.log(message.data);
+            // try to decode json (I assume that each message
+            // from server is json)
+            try {
+                var json = JSON.parse(message.data);
+                console.log(json);
+                var table = document.getElementById("Table_Messages");
+                var row = table.insertRow(1);
+                var cell1 = row.insertCell(0);
+                var cell2 = row.insertCell(1);
+                var cell3 = row.insertCell(2);
+                cell1.innerHTML = String(json.Device);
+                cell2.innerHTML = String(json.Topic);
+                cell3.innerHTML = String(json.Payload);
+                /*$("div").prepend(
+                    `<th><td> ${json.Device}</td><td>${json.Topic}</td><td>${json.Payload}</td></th>`
+                    );*/
+            } catch (e) {
+                console.log("This doesn\"t look like a valid JSON: ",
+                    message.data);
+
+            }
+            // handle incoming message
+        };
+
+        document.getElementById("button").onclick = function () {
+            console.log("pressed");
+            var Endpoint = $("#Endpoint").val();
+            var Device = $("#Device").val();
+            var Topic = $("#Topic").val();
+            var msg = {"Endpoint": Endpoint, "Device": Device, "Topic": Topic};
+            var msgJSON = JSON.stringify(msg);
+            console.log(msgJSON);
+            connection.send(msgJSON);
+            document.getElementById("Endpoint").disabled = true;
+            document.getElementById("Endpoint").blur();
+            document.getElementById("Device").disabled = true;
+            document.getElementById("Device").blur();
+            document.getElementById("Topic").disabled = true;
+            document.getElementById("Topic").blur();
+            document.getElementById("button").disabled = true;
+        }
+    });
+
+
+</script>
+</body>
+</html>
