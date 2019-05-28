@@ -57,7 +57,7 @@
     </div>
 
     <div class="row col-sm-12 displaystyle-leftborder displaystyle-danger displaystyle-lg" hidden id="ErrorBox">
-        <p>Error: Please re-enter the connection string or refresh your browser.</p>
+        <p id="ErrorMessage">Error: Please re-enter the connection string or refresh your browser.</p>
     </div>
 </div>
 
@@ -122,6 +122,8 @@
                 document.getElementById("WelcomeBox").hidden = true;
                 document.getElementById("ConnectionBox").hidden = true;
                 document.getElementById("ErrorBox").hidden = false;
+                document.getElementById("ErrorMessage").innerHTML = String(message.data);
+
 
 
             }
