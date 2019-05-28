@@ -52,12 +52,17 @@
         <p id="ConnectionMessage">Connection Successful. Waiting for messages.
     </div>
 
+    <div class="row col-sm-12 displaystyle-leftborder displaystyle-success displaystyle-lg" hidden id="ConnectingBox">
+        <p>Connecting....
+    </div>
+
     <div class="row col-sm-12 displaystyle-leftborder displaystyle-danger displaystyle-lg" hidden id="ErrorBox">
         <p>Error: Please re-enter the connection string or refresh your browser.</p>
     </div>
 </div>
-<!-- Optional JavaScript -->
-<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+
+
+<!-- jQuery -->
 <script crossorigin="anonymous"
         integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
         src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
@@ -69,6 +74,7 @@
         // if user is running mozilla then use it"s built-in WebSocket
         window.WebSocket = window.WebSocket || window.MozWebSocket;
 
+        //open websocket server on port 1337
         var connection = new WebSocket("ws://127.0.0.1:1337");
         connection.onopen = function () {
             // connection is opened and ready to use
@@ -80,16 +86,20 @@
 
         connection.onmessage = function (message) {
             console.log(message.data);
-            // try to decode json (I assume that each message
+            // try to decode json (I assume that each correct message
             // from server is json)
             try {
                 var json = JSON.parse(message.data);
                 console.log(json);
+                //check if it is connected to Azure
                 if (json.Connected === "True") {
                     document.getElementById("ConnectionBox").hidden = false;
+                    document.getElementById("ConnectingBox").hidden = true;
                 } else {
                     document.getElementById("ConnectionBox").hidden = true;
+                    //get the place the messages are going to be displayed
                     var messagesDiv = document.querySelector('.container');
+                    //insert the new message at the top of the page
                     messagesDiv.insertAdjacentHTML('afterbegin',
                         '<div class="row col-sm-12 displaystyle-leftborder displaystyle-info displaystyle-lg">' +
                         '<table><tr><th>Device:</th><td>' +
@@ -99,14 +109,12 @@
                         '</td></tr><tr><th>Message:</th><td>' +
                         String(json.Payload) +
                         '</td></tr></table></div>');
-
-                    /*$("div").prepend(
-                    `<th><td> ${json.Device}</td><td>${json.Topic}</td><td>${json.Payload}</td></th>`
-                    );*/
                 }
             } catch (e) {
+                //if an error message has been returned
                 console.log("This doesn\"t look like a valid JSON: ",
                     message.data);
+                document.getElementById("ConnectingBox").hidden = true;
                 document.getElementById("Endpoint").disabled = false;
                 document.getElementById("Device").disabled = false;
                 document.getElementById("Topic").disabled = false;
@@ -117,19 +125,23 @@
 
 
             }
-            // handle incoming message
         };
 
         document.getElementById("button").onclick = function () {
+            //get values of the input boxes
             var Endpoint = $("#Endpoint").val();
             var Device = $("#Device").val();
             var Topic = $("#Topic").val();
             var msg = {"Endpoint": Endpoint, "Device": Device, "Topic": Topic};
             var msgJSON = JSON.stringify(msg);
             console.log(msgJSON);
+
+            //send values in json to server
             connection.send(msgJSON);
+
+            //disable input boxes and wait for the server to return connected
             document.getElementById("ErrorBox").hidden = true;
-            document.getElementById("ConnectionBox").hidden = false;
+            document.getElementById("WelcomeBox").hidden = false;
             document.getElementById("Endpoint").disabled = true;
             document.getElementById("Endpoint").blur();
             document.getElementById("Device").disabled = true;
@@ -138,6 +150,7 @@
             document.getElementById("Topic").blur();
             document.getElementById("button").disabled = true;
             document.getElementById("WelcomeBox").hidden = true;
+            document.getElementById("ConnectingBox").hidden = false;
 
         }
     });
