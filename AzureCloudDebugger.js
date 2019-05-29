@@ -42,33 +42,35 @@ wsServer.on("request", function (request) {
 
             const client = EventHubClient.createFromConnectionString(connectionString, eventHubsName);
             const allPartitionIds = await client.getPartitionIds();
-            const firstPartitionId = allPartitionIds[2];
-            const startTime = lastMessageTime;
-            console.log("Device Connected");
-            var connected = false;
-            const receiveHandler = client.receive(firstPartitionId, eventData => {
-                if (connected === false) {
-                    connection.send('{"Connected":"True"}');
-                    connected = true;
-                }
-                if (Math.floor((eventData.annotations["iothub-enqueuedtime"]) / 1000) > startTime &&
-                    (eventData.annotations["iothub-connection-device-id"] === device || device === "") &&
-                    (Object.keys(eventData._raw_amqp_mesage.application_properties)[0] === topic || topic === "")) {
-                    var messageData = {
-                        "Device": eventData.annotations["iothub-connection-device-id"],
-                        "Topic": Object.keys(eventData._raw_amqp_mesage.application_properties)[0],
-                        "Payload": String(eventData.body)
-                    };
-                    var responseJSON = JSON.stringify(messageData);
-                    if (connection.state === "closed") {
-                        receiveHandler.stop();
-                        client.close();
+            for (i = 0; i < allPartitionIds.length; i++) {
+                const partitionId = allPartitionIds[i];
+                const startTime = lastMessageTime;
+                var connected = false;
+                const receiveHandler = client.receive(partitionId, eventData => {
+                    if (connected === false) {
+                        connection.send('{"Connected":"True"}');
+                        connected = true;
+                        console.log("Device Connected");
                     }
-                    connection.send(responseJSON);
-                }
-            }, error => {
-                console.log("Error when receiving message: ", error);
-            });
+                    if (Math.floor((eventData.annotations["iothub-enqueuedtime"]) / 1000) > startTime &&
+                        (eventData.annotations["iothub-connection-device-id"] === device || device === "") &&
+                        (Object.keys(eventData._raw_amqp_mesage.application_properties)[0] === topic || topic === "")) {
+                        var messageData = {
+                            "Device": eventData.annotations["iothub-connection-device-id"],
+                            "Topic": Object.keys(eventData._raw_amqp_mesage.application_properties)[0],
+                            "Payload": String(eventData.body)
+                        };
+                        var responseJSON = JSON.stringify(messageData);
+                        if (connection.state === "closed") {
+                            receiveHandler.stop();
+                            client.close();
+                        }
+                        connection.send(responseJSON);
+                    }
+                }, error => {
+                    console.log("Error when receiving message: ", error);
+                });
+            }
 // Sleep for a while before stopping the receive operation.
         }
 
