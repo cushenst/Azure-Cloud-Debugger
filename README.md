@@ -18,7 +18,7 @@ The app should now be running on [localhost:8080](http://localhost:8080)
 
 ```$bash
 
-$ docker pull cushenst/azure-iothub
+$ docker pull cushenst/azure-debugger
 $ docker run -p 8080:8080 -p 1337:1337 -it cushenst/azure-iothub
 
 ```
