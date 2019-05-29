@@ -14,3 +14,13 @@ $ npm start
 
 The app should now be running on [localhost:8080](http://localhost:8080)
 
+## running with Docker
+
+```$bash
+
+$ docker pull cushenst/azure-iothub
+$ docker run -p 8080:8080 -p 1337:1337 -it cushenst/azure-iothub
+
+```
+
+more information can be found [here](https://hub.docker.com/r/cushenst/azure-iothub)
