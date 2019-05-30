@@ -13,6 +13,10 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node AzureCloudDebugger.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/cushenst/Azure-Cloud-Debugger.git"
+  },
   "author": "Stephen Cushen",
   "license": "MIT"
 }
