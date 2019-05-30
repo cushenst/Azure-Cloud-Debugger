@@ -106,7 +106,10 @@
             // from server is json)
             try {
                 var parsedMessage = JSON.parse(message.data);
-                console.log(parsedMessage);
+                parsedMessage.Payload = JSON.stringify(parsedMessage.Payload);
+
+                if(parsedMessage.Payload === undefined)
+                    parsedMessage.Payload = "";
                 //check if it is connected to Azure
                 if (parsedMessage.Connected === "True") {
                     // hide the connecting... message
@@ -130,7 +133,7 @@
                         '</td></tr><tr><th>Topic:</th><td>' +
                         String(parsedMessage.Topic) +
                         '</td></tr><tr><th>Message:</th><td>' +
-                        String(parsedMessage.Payload) +
+                        parsedMessage.Payload +
                         '</td></tr></table></div>');
 
                 }
