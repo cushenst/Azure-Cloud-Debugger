@@ -83,7 +83,6 @@ webSocketServer.on("connection", function connection(connection) {
                         (Object.keys(eventData._raw_amqp_mesage.application_properties)[0] === topic || topic === "")) {
                         if (Buffer.isBuffer(eventData.body))
                             eventData.body = eventData.body.toString('utf8');
-                        console.log(eventData);
 
                         //format the message data to return to the client
                         var messageData = {
