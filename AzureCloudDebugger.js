@@ -1,105 +1,130 @@
-const {EventHubClient, delay} = require("@azure/event-hubs");
+//imoprt libraries
+const {EventHubClient} = require("@azure/event-hubs");
+const express = require('express');
+const http = require('http');
+const WebSocket = require('ws');
+//create the express app
+const app = express();
+//set the port for the http and webSocket server to listen on
+const port = 3000;
 
-var WebSocketServer = require("websocket").server;
-var http = require("http");
+//create http server
+const httpServer = http.createServer(app);
 
-var express = require("express");
-var app = express();
-
-var SocketServer = http.createServer(function (request, response) {
-// process HTTP request. Since we"re writing just WebSockets
-// server we don"t have to implement anything.
+//create websocket server
+const webSocketServer = new WebSocket.Server({
+    'server': httpServer
 });
-SocketServer.listen(1337, function () {
+
+//return the home page
+app.get("/", function (req, res) {
+    res.sendFile(__dirname + "/public/" + "index.html");
 });
 
-// create the server
-wsServer = new WebSocketServer({
-    httpServer: SocketServer
+//return the css and other static files
+app.get("/static/:page", function (req, res) {
+    res.sendFile(__dirname + "/public/" + req.params["page"]);
 });
+
 
 // WebSocket server
-wsServer.on("request", function (request) {
-    var connection = request.accept(null, request.origin);
+webSocketServer.on("connection", function connection(connection) {
     console.log("connection requested");
 
-// This is the most important callback for us, we"ll handle
-// all messages from users here.
+    //handles when the client send the connection information to the server
     connection.on("message", function (message) {
-        const parameters = String(message.utf8Data);
-        var json_data = JSON.parse(parameters);
+
+        //Parse the connection information
+        const parameters = String(message);
+        const json_data = JSON.parse(parameters);
+
+        //set the connection string, topic, and device variables
         const connectionString = json_data.Endpoint;
         const topic = json_data.Topic;
         const device = json_data.Device;
+
+        //get the eventhub name from the last part of the connections string.
         const eventHubsName = connectionString.split("=")[5];
 
-        lastMessageTime = Math.floor(Date.now() / 1000);
-        if (lastMessageTime === undefined) {
-            var lastMessageTime = 0;
-        }
+        //get the current time
+        let currentTime = Math.floor(Date.now() / 1000);
 
         async function main() {
 
+            //start the azure client listening to the eventhub
             const client = EventHubClient.createFromConnectionString(connectionString, eventHubsName);
+            //get the number of partations
             const allPartitionIds = await client.getPartitionIds();
+
+            //loop through all partitions.
             for (i = 0; i < allPartitionIds.length; i++) {
+
                 const partitionId = allPartitionIds[i];
-                const startTime = lastMessageTime;
-                var connected = false;
+                const startTime = currentTime;
+
+                //set connected to the partition to false
+                let connectedToPartition = false;
+
+                //start the eventHandler on current partition
                 const receiveHandler = client.receive(partitionId, eventData => {
-                    if (connected === false) {
+
+                    //send message to client that we have connected to at least 1 partition.
+                    if (connectedToPartition === false) {
                         connection.send('{"Connected":"True"}');
-                        connected = true;
+                        connectedToPartition = true;
                         console.log("Device Connected");
                     }
+
+                    //check if the message received is after the connection time of the client
+                    // is the device the client is looking to receive
+                    // and/or is the topic the client specified
                     if (Math.floor((eventData.annotations["iothub-enqueuedtime"]) / 1000) > startTime &&
                         (eventData.annotations["iothub-connection-device-id"] === device || device === "") &&
                         (Object.keys(eventData._raw_amqp_mesage.application_properties)[0] === topic || topic === "")) {
+
+                        //format the message data to return to the client
                         var messageData = {
                             "Device": eventData.annotations["iothub-connection-device-id"],
                             "Topic": Object.keys(eventData._raw_amqp_mesage.application_properties)[0],
                             "Payload": String(eventData.body)
                         };
+
+                        //format it in a json string
                         var responseJSON = JSON.stringify(messageData);
-                        if (connection.state === "closed") {
+
+                        //check to see if the connection has been closed by the client
+                        if (connection.readyState === 3) {
                             receiveHandler.stop();
                             client.close();
+                        }else {
+                            //send the message back to the client
+                            connection.send(responseJSON);
                         }
-                        connection.send(responseJSON);
+
                     }
+                // there was an error receiving a message from a partition.
                 }, error => {
                     console.log("Error when receiving message: ", error);
                 });
             }
-// Sleep for a while before stopping the receive operation.
-        }
 
+        }
+        // there was an error connection to the eventhub
         main().catch(err => {
+            //print the error
             console.log("Error occurred: ", err);
-            connection.send(err);
-            receiveHandler.stop();
-            client.close();
+
+            //send error to the client
+            connection.send(String(err));
         });
 
-
     });
-    connection.on("close", function (connection) {
 
-    });
 });
 
-
-app.get("/", function (req, res) {
-    res.sendFile(__dirname + "/public/" + "index.html");
-});
-
-app.get("/static/:page", function (req, res) {
-    res.sendFile(__dirname + "/public/" + req.params["page"]);
-});
-
-var server1 = app.listen(8080, function () {
-    var host = server1.address().address;
-    var port = server1.address().port;
-
+//start the server on specified port and print the connection details
+const details = httpServer.listen(port, function () {
+    const host = details.address().address;
+    const port = details.address().port;
     console.log("app listening at http://%s:%s", host, port);
 });

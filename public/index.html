@@ -2,17 +2,20 @@
 <html lang="en">
 <head>
 
-
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport">
 
-    <!-- Bootstrap CSS -->
+    <!-- Bootstrap and CSS -->
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css" rel="stylesheet">
     <link href="/static/index.css" rel="stylesheet" type="text/css">
+    <!-- Set Title -->
     <title>Azure IoT Hub Cloud Subscriber</title>
+
 </head>
+
 <body>
+<!-- nav bar and header -->
 <header>
     <nav class="navbar navbar-inverse">
         <div class="container-fluid">
@@ -23,12 +26,16 @@
     </nav>
 </header>
 
+<!-- User Input boxes  -->
 <div style="text-align: center;">
+
     <table align="center">
+
         <tr>
             <th>Azure Endpoint String:</th>
             <td><label for="Endpoint"></label><input id="Endpoint" size="30" type="text"/></td>
         </tr>
+
         <tr>
             <th><h4>Device to listen to messages from (optional):</h4></th>
             <td><label for="Device"></label><input id="Device" size="30" type="text"/></td>
@@ -38,16 +45,24 @@
             <th>Topic to subscribe to (optional):</th>
             <td><label for="Topic"></label><input id="Topic" size="30" type="text"/></td>
         </tr>
+
     </table>
+
     <br>
     <br>
+
     <button id="button">Submit</button>
 
 </div>
+
+<!-- messages and welcome box  -->
+
 <div class="container">
+
     <div class="row col-sm-12 displaystyle-leftborder displaystyle-info displaystyle-lg" id="WelcomeBox">
         <p id="WelcomeMessage">Please enter the connection Endpoint String.
     </div>
+
     <div class="row col-sm-12 displaystyle-leftborder displaystyle-success displaystyle-lg" hidden id="ConnectionBox">
         <p id="ConnectionMessage">Connection Successful. Waiting for messages.
     </div>
@@ -65,17 +80,17 @@
 <!-- jQuery -->
 <script crossorigin="anonymous"
         integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-        src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+        src="https://code.jquery.com/jquery-3.3.1.slim.min.js">
+
+</script>
 
 
 <script type="text/javascript">
 
     $(function () {
-        // if user is running mozilla then use it"s built-in WebSocket
-        window.WebSocket = window.WebSocket || window.MozWebSocket;
 
-        //open websocket server on port 1337
-        var connection = new WebSocket("ws://127.0.0.1:1337");
+        //open websocket to server on port 3000
+        var connection = new WebSocket("ws://127.0.0.1:3000");
         connection.onopen = function () {
             // connection is opened and ready to use
         };
@@ -86,44 +101,59 @@
 
         connection.onmessage = function (message) {
             console.log(message.data);
+
             // try to decode json (I assume that each correct message
             // from server is json)
             try {
-                var json = JSON.parse(message.data);
-                console.log(json);
+                var parsedMessage = JSON.parse(message.data);
+                console.log(parsedMessage);
                 //check if it is connected to Azure
-                if (json.Connected === "True") {
+                if (parsedMessage.Connected === "True") {
+                    // hide the connecting... message
                     document.getElementById("ConnectionBox").hidden = false;
+
+                    // display the successfully connecting message
                     document.getElementById("ConnectingBox").hidden = true;
+
                 } else {
+                    // hide the connecting... message
                     document.getElementById("ConnectionBox").hidden = true;
+
                     //get the place the messages are going to be displayed
                     var messagesDiv = document.querySelector('.container');
+
                     //insert the new message at the top of the page
                     messagesDiv.insertAdjacentHTML('afterbegin',
                         '<div class="row col-sm-12 displaystyle-leftborder displaystyle-info displaystyle-lg">' +
                         '<table><tr><th>Device:</th><td>' +
-                        String(json.Device) +
+                        String(parsedMessage.Device) +
                         '</td></tr><tr><th>Topic:</th><td>' +
-                        String(json.Topic) +
+                        String(parsedMessage.Topic) +
                         '</td></tr><tr><th>Message:</th><td>' +
-                        String(json.Payload) +
+                        String(parsedMessage.Payload) +
                         '</td></tr></table></div>');
+
                 }
+
             } catch (e) {
                 //if an error message has been returned
-                console.log("This doesn\"t look like a valid JSON: ",
-                    message.data);
+                console.log("Error: ", message.data);
+
+                //hide the connecting... message
                 document.getElementById("ConnectingBox").hidden = true;
+
+                //unlock the input boxes
                 document.getElementById("Endpoint").disabled = false;
                 document.getElementById("Device").disabled = false;
                 document.getElementById("Topic").disabled = false;
                 document.getElementById("button").disabled = false;
+
+                //hide the welcome message
                 document.getElementById("WelcomeBox").hidden = true;
-                document.getElementById("ConnectionBox").hidden = true;
+
+                //display the error box with the error message
                 document.getElementById("ErrorBox").hidden = false;
                 document.getElementById("ErrorMessage").innerHTML = String(message.data);
-
 
 
             }
@@ -134,16 +164,20 @@
             var Endpoint = $("#Endpoint").val();
             var Device = $("#Device").val();
             var Topic = $("#Topic").val();
-            var msg = {"Endpoint": Endpoint, "Device": Device, "Topic": Topic};
-            var msgJSON = JSON.stringify(msg);
-            console.log(msgJSON);
+
+            //format the inputs into a messages to be sent to the server
+            var messageFormatted = {"Endpoint": Endpoint, "Device": Device, "Topic": Topic};
+            var messageFormattedJSON = JSON.stringify(messageFormatted);
+            console.log(messageFormattedJSON);
 
             //send values in json to server
-            connection.send(msgJSON);
+            connection.send(messageFormattedJSON);
 
-            //disable input boxes and wait for the server to return connected
+            //hide the error box an welcome box
             document.getElementById("ErrorBox").hidden = true;
             document.getElementById("WelcomeBox").hidden = false;
+
+            //disable and un-focus the input boxes and submit button
             document.getElementById("Endpoint").disabled = true;
             document.getElementById("Endpoint").blur();
             document.getElementById("Device").disabled = true;
@@ -151,7 +185,11 @@
             document.getElementById("Topic").disabled = true;
             document.getElementById("Topic").blur();
             document.getElementById("button").disabled = true;
+
+            //hide the welcome message box
             document.getElementById("WelcomeBox").hidden = true;
+
+            //display the connecting... message
             document.getElementById("ConnectingBox").hidden = false;
 
         }
