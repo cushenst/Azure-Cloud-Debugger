@@ -7,8 +7,7 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 RUN npm install
 
-EXPOSE 8080
-EXPOSE 1337
+EXPOSE 3000
 
 COPY . .
 
