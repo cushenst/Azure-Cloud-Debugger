@@ -119,6 +119,14 @@
                     document.getElementById("ConnectingBox").hidden = true;
 
                 } else {
+                    //calculate message time
+                    var date = new Date(parsedMessage.Time);
+                    var hours = date.getHours();
+                    var minutes = "0" + date.getMinutes();
+                    var seconds = "0" + date.getSeconds();
+                    //format time in correct format
+                    var formattedTime = hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
+
                     // hide the connecting... message
                     document.getElementById("ConnectionBox").hidden = true;
 
@@ -134,6 +142,8 @@
                         String(parsedMessage.Topic) +
                         '</td></tr><tr><th>Message:</th><td>' +
                         parsedMessage.Payload +
+                        '</td></tr><tr><th>Time:</th><td>' +
+                        String(formattedTime) +
                         '</td></tr></table></div>');
 
                 }
