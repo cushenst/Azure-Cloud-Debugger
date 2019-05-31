@@ -2,11 +2,11 @@ version: 2.1
 executors:
   docker-publisher:
     environment:
-      IMAGE_NAME: cushenst/building-on-ci
+      IMAGE_NAME: cushenst/azure-debugger
     docker:
       - image: circleci/buildpack-deps:stretch
 jobs:
-  build:
+  build-image:
     executor: docker-publisher
     steps:
       - checkout
@@ -36,11 +36,37 @@ jobs:
           command: |
             echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
             docker push $IMAGE_NAME:latest
+
+  build-check:
+    docker:
+      # specify the version you desire here
+      - image: circleci/node:10.15.3
+
+
+    working_directory: ~/app
+
+    steps:
+      - checkout
+
+      # Download and cache dependencies
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "package.json" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-
+
+      - run: npm install
+
+      - save_cache:
+          paths:
+            - node_modules
+          key: v1-dependencies-{{ checksum "package.json" }}
+
 workflows:
   version: 2
   build-master:
     jobs:
-      - build:
+      - build-image:
           filters:
             branches:
               only: master
@@ -50,3 +76,15 @@ workflows:
           filters:
             branches:
               only: master
+      - build-check:
+          filters:
+            branches:
+              ignore: master
+
+
+
+
+
+
+
+
