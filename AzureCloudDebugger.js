@@ -66,7 +66,7 @@ webSocketServer.on("connection", function connection(connection) {
                 let connectedToPartition = false;
 
                 //start the eventHandler on current partition
-                cont receiveHandler = client.receive(partitionId, eventData => {
+                const receiveHandler = client.receive(partitionId, eventData => {
 
                     //send message to client that we have connected to at least 1 partition.
                     if (connectedToPartition === false) {
