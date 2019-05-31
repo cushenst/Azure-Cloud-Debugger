@@ -23,4 +23,4 @@ $ docker run -p 3000:3000 -it cushenst/azure-iothub
 
 ```
 
-more information can be found [here](https://hub.docker.com/r/cushenst/azure-iothub)
+more information can be found [here](https://hub.docker.com/r/cushenst/azure-debugger)

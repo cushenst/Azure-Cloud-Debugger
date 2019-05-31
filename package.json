@@ -1,7 +1,7 @@
 {
-  "name": "nodejs",
+  "name": "azure-debugger",
   "version": "1.0.0",
-  "description": "",
+  "description": "Utility to debug Azure IoT Hub",
   "main": "AzureCloudDebugger.js",
   "dependencies": {
     "@azure/event-hubs": "^2.0.0",
@@ -13,6 +13,6 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node AzureCloudDebugger.js"
   },
-  "author": "",
-  "license": "ISC"
+  "author": "Stephen Cushen",
+  "license": "MIT"
 }

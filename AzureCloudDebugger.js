@@ -81,16 +81,19 @@ webSocketServer.on("connection", function connection(connection) {
                     if (Math.floor((eventData.annotations["iothub-enqueuedtime"]) / 1000) > startTime &&
                         (eventData.annotations["iothub-connection-device-id"] === device || device === "") &&
                         (Object.keys(eventData._raw_amqp_mesage.application_properties)[0] === topic || topic === "")) {
+                        if (Buffer.isBuffer(eventData.body))
+                            eventData.body = eventData.body.toString('utf8');
 
                         //format the message data to return to the client
                         var messageData = {
                             "Device": eventData.annotations["iothub-connection-device-id"],
                             "Topic": Object.keys(eventData._raw_amqp_mesage.application_properties)[0],
-                            "Payload": String(eventData.body)
+                            "Payload": eventData.body
                         };
 
                         //format it in a json string
                         var responseJSON = JSON.stringify(messageData);
+                        console.log(responseJSON);
 
                         //check to see if the connection has been closed by the client
                         if (connection.readyState === 3) {
