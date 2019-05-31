@@ -1,6 +1,6 @@
 {
   "name": "azure-debugger",
-  "version": "1.0",
+  "version": "1.0.0",
   "description": "Utility to debug Azure IoT Hub",
   "main": "AzureCloudDebugger.js",
   "dependencies": {
