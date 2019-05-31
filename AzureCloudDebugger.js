@@ -88,7 +88,8 @@ webSocketServer.on("connection", function connection(connection) {
                         var messageData = {
                             "Device": eventData.annotations["iothub-connection-device-id"],
                             "Topic": Object.keys(eventData._raw_amqp_mesage.application_properties)[0],
-                            "Payload": eventData.body
+                            "Payload": eventData.body,
+                            "Time" : Math.floor((eventData.annotations["iothub-enqueuedtime"]))
                         };
 
                         //format it in a json string
