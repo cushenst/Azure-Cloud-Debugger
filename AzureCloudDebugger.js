@@ -1,4 +1,4 @@
-//imoprt libraries
+//import libraries
 const {EventHubClient} = require("@azure/event-hubs");
 const express = require('express');
 const http = require('http');
@@ -24,6 +24,11 @@ app.get("/", function (req, res) {
 //return the css and other static files
 app.get("/static/:page", function (req, res) {
     res.sendFile(__dirname + "/public/" + req.params["page"]);
+});
+
+//send status at /health
+app.get("/health", function (req, res) {
+    res.sendStatus(200);
 });
 
 
