@@ -19,7 +19,7 @@ The app should now be running on [localhost:3000](http://localhost:3000)
 ```$bash
 
 $ docker pull cushenst/azure-debugger
-$ docker run -p 3000:3000 -it cushenst/azure-iothub
+$ docker run -d -p 3000:3000 cushenst/azure-iothub
 
 ```
 
