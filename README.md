@@ -12,7 +12,7 @@ $ npm install
 $ npm start
 ```
 
-The app should now be running on [localhost:8080](http://localhost:8080)
+The app should now be running on [localhost:3000](http://localhost:3000)
 
 ## running with Docker
 
@@ -22,5 +22,7 @@ $ docker pull cushenst/azure-debugger
 $ docker run -p 3000:3000 -it cushenst/azure-iothub
 
 ```
+
+The app should now be running on port [localhost:3000](http://localhost:3000).
 
 more information can be found [here](https://hub.docker.com/r/cushenst/azure-debugger)
