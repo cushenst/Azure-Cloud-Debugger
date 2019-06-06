@@ -35,7 +35,7 @@ app.get("/health", function (req, res) {
 
 // WebSocket server
 webSocketServer.on("connection", function connection(connection) {
-    console.log("connection requested");
+    console.log(Date().toString().slice(0, 24) + " - client connected");
 
     //handles when the client send the connection information to the server
     connection.on("message", function (message) {
@@ -78,7 +78,7 @@ webSocketServer.on("connection", function connection(connection) {
                     if (connectedToPartition === false) {
                         connection.send('{"Connected":"True"}');
                         connectedToPartition = true;
-                        console.log("Device Connected");
+                        console.log(Date().toString().slice(0, 24) + " - Device Connected to Azure" );
                     }
 
                     //check if the message received is after the connection time of the client
@@ -95,34 +95,35 @@ webSocketServer.on("connection", function connection(connection) {
                             "Device": eventData.annotations["iothub-connection-device-id"],
                             "Topic": Object.keys(eventData._raw_amqp_mesage.application_properties)[0],
                             "Payload": eventData.body,
-                            "Time" : Math.floor((eventData.annotations["iothub-enqueuedtime"]))
+                            "Time": Math.floor((eventData.annotations["iothub-enqueuedtime"]))
                         };
 
                         //format it in a json string
                         var responseJSON = JSON.stringify(messageData);
-                        console.log(responseJSON);
+                        console.log(Date().toString().slice(0, 24) + " - " + responseJSON);
 
                         //check to see if the connection has been closed by the client
                         if (connection.readyState === 3) {
                             receiveHandler.stop();
                             client.close();
-                        }else {
+                        } else {
                             //send the message back to the client
                             connection.send(responseJSON);
                         }
 
                     }
-                // there was an error receiving a message from a partition.
+                    // there was an error receiving a message from a partition.
                 }, error => {
-                    console.log("Error when receiving message: ", error);
+                    console.log(Date().toString().slice(0, 24) + " - Error when receiving message: " + error);
                 });
             }
 
         }
+
         // there was an error connection to the eventhub
         main().catch(err => {
             //print the error
-            console.log("Error occurred: ", err);
+            console.log(Date().toString().slice(0, 24) + " - Error occurred: ", err);
 
             //send error to the client
             connection.send(String(err));
@@ -136,5 +137,5 @@ webSocketServer.on("connection", function connection(connection) {
 const details = httpServer.listen(port, function () {
     const host = details.address().address;
     const port = details.address().port;
-    console.log("app listening at http://%s:%s", host, port);
+    console.log(Date().toString().slice(0, 24) + " - app listening at http://%s:%s", host, port);
 });

@@ -55,25 +55,35 @@
 
 </div>
 
-<!-- messages and welcome box  -->
+<!-- Status messages container  -->
 
 <div class="container">
 
-    <div class="row col-sm-12 displaystyle-leftborder displaystyle-info displaystyle-lg" id="WelcomeBox">
-        <p id="WelcomeMessage">Please enter the connection Endpoint String.
+    <div class="row col-sm-12 displaystyle-leftborder displaystyle-info displaystyle-lg" id="ConnectingToServerBox">
+        <p>Connecting to Server....
+    </div>
+
+
+    <div class="row col-sm-12 displaystyle-leftborder displaystyle-info displaystyle-lg" hidden id="WelcomeBox">
+        <p id="WelcomeMessage">Connected to the server, Please enter the Azure connection endpoint string.
     </div>
 
     <div class="row col-sm-12 displaystyle-leftborder displaystyle-success displaystyle-lg" hidden id="ConnectionBox">
         <p id="ConnectionMessage">Connection Successful. Waiting for messages.
     </div>
 
-    <div class="row col-sm-12 displaystyle-leftborder displaystyle-success displaystyle-lg" hidden id="ConnectingBox">
-        <p>Connecting....
+    <div class="row col-sm-12 displaystyle-leftborder displaystyle-info displaystyle-lg" hidden id="ConnectingBox">
+        <p>Connecting to Azure....
     </div>
 
     <div class="row col-sm-12 displaystyle-leftborder displaystyle-danger displaystyle-lg" hidden id="ErrorBox">
         <p id="ErrorMessage">Error: Please re-enter the connection string or refresh your browser.</p>
     </div>
+</div>
+
+<!-- Messages container -->
+<div class="container">
+
 </div>
 
 
@@ -87,21 +97,49 @@
 
 <script type="text/javascript">
 
-    $(function () {
+    $(function WebSockets() {
 
         //open websocket to server either with/without ssl
-        if(window.location.protocol === "http:")
-            var connection = new WebSocket("ws://"+window.location.host);
+        if (window.location.protocol === "http:")
+            var connection = new WebSocket("ws://" + window.location.host);
         else
-            var connection = new WebSocket("wss://"+window.location.host);
+            var connection = new WebSocket("wss://" + window.location.host);
 
         connection.onopen = function () {
             // connection is opened and ready to use
+            console.log("connected to server");
+
+            document.getElementById("ConnectingToServerBox").hidden = true;
+            document.getElementById("WelcomeBox").hidden = false;
+            document.getElementById("ErrorBox").hidden = true;
+
+            //unlock the input boxes if connection was lost
+            document.getElementById("Endpoint").disabled = false;
+            document.getElementById("Device").disabled = false;
+            document.getElementById("Topic").disabled = false;
+            document.getElementById("button").disabled = false;
+
         };
 
-        connection.onerror = function (error) {
-            // an error occurred when sending/receiving data
+        connection.onclose = function (error) {
+
+            // the connection was lost with the node js server
+            console.log("Connection to Server lost");
+
+            //hide all message and display error
+            document.getElementById("ConnectingToServerBox").hidden = true;
+            document.getElementById("WelcomeBox").hidden = true;
+            document.getElementById("ConnectionBox").hidden = true;
+            document.getElementById("ConnectingBox").hidden = true;
+            document.getElementById("ErrorBox").hidden = false;
+            document.getElementById("ErrorMessage").innerHTML = "Connection to server lost, Reconnecting...";
+
+            //try to reconnect every 5 seconds
+            setTimeout(function () {
+                WebSockets()
+            }, 5000);
         };
+
 
         connection.onmessage = function (message) {
             console.log(message.data);
@@ -112,11 +150,11 @@
                 var parsedMessage = JSON.parse(message.data);
                 parsedMessage.Payload = JSON.stringify(parsedMessage.Payload);
 
-                if(parsedMessage.Payload === undefined)
+                if (parsedMessage.Payload === undefined)
                     parsedMessage.Payload = "";
                 //check if it is connected to Azure
                 if (parsedMessage.Connected === "True") {
-                    // hide the connecting... message
+                    // hide the connecting to Azure... message
                     document.getElementById("ConnectionBox").hidden = false;
 
                     // display the successfully connecting message
@@ -135,7 +173,7 @@
                     document.getElementById("ConnectionBox").hidden = true;
 
                     //get the place the messages are going to be displayed
-                    var messagesDiv = document.querySelector('.container');
+                    var messagesDiv = document.querySelectorAll('.container')[1];
 
                     //insert the new message at the top of the page
                     messagesDiv.insertAdjacentHTML('afterbegin',
