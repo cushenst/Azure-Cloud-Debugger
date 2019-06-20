@@ -100,15 +100,16 @@ webSocketServer.on("connection", function connection(connection) {
 
                         //format it in a json string
                         var responseJSON = JSON.stringify(messageData);
-                        console.log(Date().toString().slice(0, 24) + " - " + responseJSON);
 
                         //check to see if the connection has been closed by the client
                         if (connection.readyState === 3) {
                             receiveHandler.stop();
                             client.close();
+                            console.log(Date().toString().slice(0, 24) + " - Device Disconnected from Azure");
                         } else {
                             //send the message back to the client
                             connection.send(responseJSON);
+                            console.log(Date().toString().slice(0, 24) + " - " + responseJSON);
                         }
 
                     }
