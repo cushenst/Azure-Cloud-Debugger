@@ -113,11 +113,14 @@
             document.getElementById("WelcomeBox").hidden = false;
             document.getElementById("ErrorBox").hidden = true;
 
-            //unlock the input boxes if connection was lost
+            //unlock the input boxes if connection was locked
             document.getElementById("Endpoint").disabled = false;
             document.getElementById("Device").disabled = false;
             document.getElementById("Topic").disabled = false;
             document.getElementById("button").disabled = false;
+            if (document.getElementById("Endpoint").value != "") {
+                button();
+            }
 
         };
 
@@ -215,6 +218,10 @@
         };
 
         document.getElementById("button").onclick = function () {
+            button();
+        }
+
+        function button() {
             //get values of the input boxes
             var Endpoint = $("#Endpoint").val();
             var Device = $("#Device").val();
