@@ -54,13 +54,17 @@ webSocketServer.on("connection", function connection(connection) {
 
         //get the current time
         let currentTime = Math.floor(Date.now() / 1000);
-
         async function main() {
 
             //start the azure client listening to the eventhub
             const client = EventHubClient.createFromConnectionString(connectionString, eventHubsName);
-            //get the number of partations
+            //get the number of partitions
             const allPartitionIds = await client.getPartitionIds();
+
+            connection.on('close', function close() {
+                client.close();
+                console.log(Date().toString().slice(0, 24) + " - Device Disconnected from Azure");
+            });
 
             //loop through all partitions.
             for (i = 0; i < allPartitionIds.length; i++) {
