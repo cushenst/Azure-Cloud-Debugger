@@ -78,7 +78,7 @@ webSocketServer.on("connection", function connection(connection) {
                     if (connectedToPartition === false) {
                         connection.send('{"Connected":"True"}');
                         connectedToPartition = true;
-                        console.log(Date().toString().slice(0, 24) + " - Device Connected to Azure" );
+                        console.log(Date().toString().slice(0, 24) + " - Device Connected to Azure");
                     }
 
                     //check if the message received is after the connection time of the client
@@ -116,6 +116,12 @@ webSocketServer.on("connection", function connection(connection) {
                     // there was an error receiving a message from a partition.
                 }, error => {
                     console.log(Date().toString().slice(0, 24) + " - Error when receiving message: " + error);
+                    if (String(error).includes("Exceeded the maximum number of allowed receivers per")) {
+                        connection.send(String("You have connected the maximum number of devices. Please close some devices and send a message to the IoT hub to clear any old connections"));
+                    } else {
+                        connection.send(String(error));
+                    }
+
                 });
             }
 
