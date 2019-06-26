@@ -137,6 +137,12 @@
             document.getElementById("ErrorBox").hidden = false;
             document.getElementById("ErrorMessage").innerHTML = "Connection to server lost, Reconnecting...";
 
+            //lock all input boxes
+            document.getElementById("Endpoint").disabled = true;
+            document.getElementById("Device").disabled = true;
+            document.getElementById("Topic").disabled = true;
+            document.getElementById("button").disabled = true;
+
             //try to reconnect every 5 seconds
             setTimeout(function () {
                 WebSockets()
