@@ -96,9 +96,7 @@
 
 
 <script type="text/javascript">
-
-    $(function WebSockets() {
-
+    $(function WebSockets(firstLoad = true) {
         //open websocket to server either with/without ssl
         if (window.location.protocol === "http:")
             var connection = new WebSocket("ws://" + window.location.host);
@@ -118,6 +116,11 @@
             document.getElementById("Device").disabled = false;
             document.getElementById("Topic").disabled = false;
             document.getElementById("button").disabled = false;
+            // this is needed to stop firefox been refreshed too fast and causing it to exceed the Azure rate limit. (firefox saves the connection string. This forces it not to)
+            if (firstLoad) {
+                document.getElementById("Endpoint").value = "";
+            }
+            //Refresh the Azure connection if the socket was closed. Above is needed to slow user down.
             if (document.getElementById("Endpoint").value != "") {
                 button();
             }
@@ -142,10 +145,9 @@
             document.getElementById("Device").disabled = true;
             document.getElementById("Topic").disabled = true;
             document.getElementById("button").disabled = true;
-
             //try to reconnect every 5 seconds
             setTimeout(function () {
-                WebSockets()
+                WebSockets(false)
             }, 5000);
         };
 
