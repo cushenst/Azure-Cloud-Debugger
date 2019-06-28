@@ -54,12 +54,18 @@ webSocketServer.on("connection", function connection(connection) {
 
         //get the current time
         let currentTime = Math.floor(Date.now() / 1000);
+
         async function main() {
 
             //start the azure client listening to the eventhub
             const client = EventHubClient.createFromConnectionString(connectionString, eventHubsName);
+
             //get the number of partitions
             const allPartitionIds = await client.getPartitionIds();
+
+            //send message to client that we have connected to Azure.
+            connection.send('{"Connected":"True"}');
+            console.log(Date().toString().slice(0, 24) + " - Device Connected to Azure");
 
             connection.on('close', function close() {
                 client.close();
@@ -72,18 +78,8 @@ webSocketServer.on("connection", function connection(connection) {
                 const partitionId = allPartitionIds[i];
                 const startTime = currentTime;
 
-                //set connected to the partition to false
-                let connectedToPartition = false;
-
                 //start the eventHandler on current partition
                 const receiveHandler = client.receive(partitionId, eventData => {
-
-                    //send message to client that we have connected to at least 1 partition.
-                    if (connectedToPartition === false) {
-                        connection.send('{"Connected":"True"}');
-                        connectedToPartition = true;
-                        console.log(Date().toString().slice(0, 24) + " - Device Connected to Azure");
-                    }
 
                     //check if the message received is after the connection time of the client
                     // is the device the client is looking to receive
