@@ -1,0 +1,58 @@
+.displaystyle {
+    padding: 15px;
+    margin: 15px;
+    background-color: #FFFFFF;
+    margin-bottom: 10px;
+    box-shadow: 5px 7px 7px 5px rgba(0, 0, 0, 0.19), 10px 12px 20px 10px rgba(0, 0, 0, 0.19);
+}
+
+.message-container {
+    padding: 35px;
+    font-size: 18px;
+    margin: 15px 50px;
+    background-color: #FFFFFF;
+    border-left: 9px solid;
+    box-shadow: 5px 7px 7px 5px rgba(0, 0, 0, 0.19), 10px 12px 20px 10px rgba(0, 0, 0, 0.19);
+}
+
+.displaystyle-success {
+    border-color: #80D651;
+}
+
+.displaystyle-success > strong {
+    color: #80D651;
+}
+
+.displaystyle-info {
+    border-color: #45ABCD;
+}
+
+.displaystyle-info > strong {
+    color: #45ABCD;
+}
+
+.displaystyle-warning {
+    border-color: #FEAF20;
+}
+
+.displaystyle-warning > strong {
+    color: #FEAF20;
+}
+
+.displaystyle-danger {
+    border-color: #d73814;
+}
+
+.displaystyle-danger > strong {
+    color: #d73814;
+}
+
+table, td, th {
+
+    padding-right: 50px;
+}
+
+
+
+
+

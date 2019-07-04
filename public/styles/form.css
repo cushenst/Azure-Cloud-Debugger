@@ -1,0 +1,42 @@
+.form {
+    margin: 0 auto 30px auto;
+    width: 500px;
+}
+
+input[type="text"] {
+    font-weight: normal;
+    border: 1px solid #bdcbcf;
+    padding: 6px 12px;
+    font-size: 14px;
+    background: #fff;
+    border-radius: 0;
+    line-height: 1.5;
+    cursor: text;
+    width: 50%;
+}
+
+input[type="text"]:focus {
+    border-color: #19a3dd;
+    outline: 0;
+}
+
+input[type="text"]:hover:not([disabled]) {
+    border-color: #19a3dd;
+    outline: 0;
+}
+
+input[type="text"][disabled] {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.input-label {
+    cursor: pointer;
+    width: 180px;
+    display: inline-block;
+    width: 50%;
+}
+
+.inp-row {
+    margin-bottom: 10px;
+}

@@ -1,271 +1,52 @@
 <!DOCTYPE HTML>
 <html lang="en">
 <head>
-
-    <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport">
-
-    <!-- Bootstrap and CSS -->
-    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css" rel="stylesheet">
-    <link href="/static/index.css" rel="stylesheet" type="text/css">
-    <!-- Set Title -->
+    <link href="/static/styles/index.css" rel="stylesheet" type="text/css">
     <title>Azure IoT Hub Cloud Subscriber</title>
-
 </head>
-
 <body>
-<!-- nav bar and header -->
-<header>
-    <nav class="navbar navbar-inverse">
-        <div class="container-fluid">
-            <div class="nav navbar-nav navbar-center">
-                <a class="navbar-brand" href="#">Azure IoT Hub Cloud Subscriber</a>
+<nav class="nav">
+    <span class="text">Azure IoT Hub Cloud Subscriber</span>
+</nav>
+<div class="form">
+    <div class="inp-row">
+        <label class="input-label" for="Endpoint">Azure Endpoint String:</label><input id="Endpoint" type="text"/>
+    </div>
+    <div class="inp-row">
+        <label class="input-label" for="Device">Device to listen to messages from (optional):</label><input id="Device"
+                                                                                                            type="text"/>
+    </div>
+    <div class="inp-row">
+        <label class="input-label" for="Topic">Topic to subscribe to (optional):</label><input id="Topic" type="text"/>
             </div>
-        </div>
-    </nav>
-</header>
-
-<!-- User Input boxes  -->
-<div style="text-align: center;">
-
-    <table align="center">
-
-        <tr>
-            <th>Azure Endpoint String:</th>
-            <td><label for="Endpoint"></label><input id="Endpoint" size="30" type="text"/></td>
-        </tr>
-
-        <tr>
-            <th><h4>Device to listen to messages from (optional):</h4></th>
-            <td><label for="Device"></label><input id="Device" size="30" type="text"/></td>
-        </tr>
-
-        <tr>
-            <th>Topic to subscribe to (optional):</th>
-            <td><label for="Topic"></label><input id="Topic" size="30" type="text"/></td>
-        </tr>
-
-    </table>
-
-    <br>
-    <br>
-
-    <button id="button">Submit</button>
-
+    <div class="btn-container">
+        <button class="btn" id="button">Submit</button>
+    </div>
 </div>
-
-<!-- Status messages container  -->
-
-<div class="container">
-
-    <div class="row col-sm-12 displaystyle-leftborder displaystyle-info displaystyle-lg" id="ConnectingToServerBox">
+<div class="container info-messages">
+    <div class="displaystyle-info message-container" id="ConnectingToServerBox">
         <p>Connecting to Server....
     </div>
-
-
-    <div class="row col-sm-12 displaystyle-leftborder displaystyle-warning displaystyle-lg" hidden id="WelcomeBox">
+    <div class="displaystyle-warning message-container" hidden id="WelcomeBox">
         <p id="WelcomeMessage">Connected to the server, Please enter the Azure connection endpoint string.
     </div>
-
-    <div class="row col-sm-12 displaystyle-leftborder displaystyle-success displaystyle-lg" hidden id="ConnectionBox">
+    <div class="displaystyle-success message-container" hidden id="ConnectionBox">
         <p id="ConnectionMessage">Connection Successful. Waiting for messages.
     </div>
-
-    <div class="row col-sm-12 displaystyle-leftborder displaystyle-info displaystyle-lg" hidden id="ConnectingBox">
+    <div class="displaystyle-info message-container" hidden id="ConnectingBox">
         <p>Connecting to Azure....
     </div>
-
-    <div class="row col-sm-12 displaystyle-leftborder displaystyle-danger displaystyle-lg" hidden id="ErrorBox">
+    <div class="displaystyle-danger message-container" hidden id="ErrorBox">
         <p id="ErrorMessage">Error: Please re-enter the connection string or refresh your browser.</p>
     </div>
 </div>
-
-<!-- Messages container -->
-<div class="container">
-
-</div>
-
-
-<!-- jQuery -->
+<div class="container device-messages"></div>
 <script crossorigin="anonymous"
         integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
         src="https://code.jquery.com/jquery-3.3.1.slim.min.js">
-
 </script>
-
-
-<script type="text/javascript">
-    $(function WebSockets(firstLoad = true) {
-        //open websocket to server either with/without ssl
-        if (window.location.protocol === "http:")
-            var connection = new WebSocket("ws://" + window.location.host);
-        else
-            var connection = new WebSocket("wss://" + window.location.host);
-
-        connection.onopen = function () {
-            // connection is opened and ready to use
-            console.log("connected to server");
-
-            document.getElementById("ConnectingToServerBox").hidden = true;
-            document.getElementById("WelcomeBox").hidden = false;
-            document.getElementById("ErrorBox").hidden = true;
-
-            //unlock the input boxes if connection was locked
-            document.getElementById("Endpoint").disabled = false;
-            document.getElementById("Device").disabled = false;
-            document.getElementById("Topic").disabled = false;
-            document.getElementById("button").disabled = false;
-            // this is needed to stop firefox been refreshed too fast and causing it to exceed the Azure rate limit. (firefox saves the connection string. This forces it not to)
-            if (firstLoad) {
-                document.getElementById("Endpoint").value = "";
-            }
-            //Refresh the Azure connection if the socket was closed. Above is needed to slow user down.
-            if (document.getElementById("Endpoint").value != "") {
-                button();
-            }
-
-        };
-
-        connection.onclose = function (error) {
-
-            // the connection was lost with the node js server
-            console.log("Connection to Server lost");
-
-            //hide all message and display error
-            document.getElementById("ConnectingToServerBox").hidden = true;
-            document.getElementById("WelcomeBox").hidden = true;
-            document.getElementById("ConnectionBox").hidden = true;
-            document.getElementById("ConnectingBox").hidden = true;
-            document.getElementById("ErrorBox").hidden = false;
-            document.getElementById("ErrorMessage").innerHTML = "Connection to server lost, Reconnecting...";
-
-            //lock all input boxes
-            document.getElementById("Endpoint").disabled = true;
-            document.getElementById("Device").disabled = true;
-            document.getElementById("Topic").disabled = true;
-            document.getElementById("button").disabled = true;
-            //try to reconnect every 5 seconds
-            setTimeout(function () {
-                WebSockets(false)
-            }, 5000);
-        };
-
-
-        connection.onmessage = function (message) {
-            console.log(message.data);
-
-            // try to decode json (I assume that each correct message
-            // from server is json)
-            try {
-                var parsedMessage = JSON.parse(message.data);
-                parsedMessage.Payload = JSON.stringify(parsedMessage.Payload);
-
-                if (parsedMessage.Payload === undefined)
-                    parsedMessage.Payload = "";
-                //check if it is connected to Azure
-                if (parsedMessage.Connected === "True") {
-                    // hide the connecting to Azure... message
-                    document.getElementById("ConnectionBox").hidden = false;
-
-                    // display the successfully connecting message
-                    document.getElementById("ConnectingBox").hidden = true;
-
-                } else {
-                    //calculate message time
-                    var date = new Date(parsedMessage.Time);
-                    var hours = date.getHours();
-                    var minutes = "0" + date.getMinutes();
-                    var seconds = "0" + date.getSeconds();
-                    //format time in correct format
-                    var formattedTime = hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
-
-                    // hide the connecting... message
-                    document.getElementById("ConnectionBox").hidden = true;
-
-                    //get the place the messages are going to be displayed
-                    var messagesDiv = document.querySelectorAll('.container')[1];
-
-                    //insert the new message at the top of the page
-                    messagesDiv.insertAdjacentHTML('afterbegin',
-                        '<div class="row col-sm-12 displaystyle-leftborder displaystyle-info displaystyle-lg">' +
-                        '<table><tr><th>Device:</th><td>' +
-                        String(parsedMessage.Device) +
-                        '</td></tr><tr><th>Topic:</th><td>' +
-                        String(parsedMessage.Topic) +
-                        '</td></tr><tr><th>Message:</th><td>' +
-                        parsedMessage.Payload +
-                        '</td></tr><tr><th>Time:</th><td>' +
-                        String(formattedTime) +
-                        '</td></tr></table></div>');
-
-                }
-
-            } catch (e) {
-                //if an error message has been returned
-                console.log("Error: ", message.data);
-
-                //hide the connecting... message
-                document.getElementById("ConnectingBox").hidden = true;
-
-                //unlock the input boxes
-                document.getElementById("Endpoint").disabled = false;
-                document.getElementById("Device").disabled = false;
-                document.getElementById("Topic").disabled = false;
-                document.getElementById("button").disabled = false;
-
-                //hide the welcome message
-                document.getElementById("WelcomeBox").hidden = true;
-
-                //display the error box with the error message
-                document.getElementById("ErrorBox").hidden = false;
-                document.getElementById("ErrorMessage").innerHTML = String(message.data);
-
-
-            }
-        };
-
-        document.getElementById("button").onclick = function () {
-            button();
-        }
-
-        function button() {
-            //get values of the input boxes
-            var Endpoint = $("#Endpoint").val();
-            var Device = $("#Device").val();
-            var Topic = $("#Topic").val();
-
-            //format the inputs into a messages to be sent to the server
-            var messageFormatted = {"Endpoint": Endpoint, "Device": Device, "Topic": Topic};
-            var messageFormattedJSON = JSON.stringify(messageFormatted);
-            console.log(messageFormattedJSON);
-
-            //send values in json to server
-            connection.send(messageFormattedJSON);
-
-            //hide the error box an welcome box
-            document.getElementById("ErrorBox").hidden = true;
-            document.getElementById("WelcomeBox").hidden = false;
-
-            //disable and un-focus the input boxes and submit button
-            document.getElementById("Endpoint").disabled = true;
-            document.getElementById("Endpoint").blur();
-            document.getElementById("Device").disabled = true;
-            document.getElementById("Device").blur();
-            document.getElementById("Topic").disabled = true;
-            document.getElementById("Topic").blur();
-            document.getElementById("button").disabled = true;
-
-            //hide the welcome message box
-            document.getElementById("WelcomeBox").hidden = true;
-
-            //display the connecting... message
-            document.getElementById("ConnectingBox").hidden = false;
-
-        }
-    });
-
-
-</script>
+<script src="/static/scripts/index.js" type="text/javascript"></script>
 </body>
 </html>

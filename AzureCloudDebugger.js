@@ -23,9 +23,7 @@ app.get("/", function (req, res) {
 });
 
 //return the css and other static files
-app.get("/static/:page", function (req, res) {
-    res.sendFile(__dirname + "/public/" + req.params["page"]);
-});
+app.use('/static', express.static('public'));
 
 //send status at /health
 app.get("/health", function (req, res) {

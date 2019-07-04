@@ -1,0 +1,22 @@
+.btn {
+    cursor: pointer;
+    border: solid 1px transparent;
+    border-radius: 4px;
+    padding: 0px 20px;
+    line-height: 36px;
+    font-size: 14px;
+    min-width: 136px;
+    outline: none;
+    background-color: #ffc93e;
+    color: #1d1d1b;
+}
+
+.btn:hover,
+.btn:active {
+    opacity: 0.85;
+
+}
+
+.btn-container {
+    text-align: right;
+}

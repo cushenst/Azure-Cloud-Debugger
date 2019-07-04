@@ -5,13 +5,15 @@
   "main": "AzureCloudDebugger.js",
   "dependencies": {
     "@azure/event-hubs": "^2.0.0",
+    "concat": "^1.0.3",
     "express": "^4.17.0",
     "ws": "^7.0.0"
   },
   "devDependencies": {},
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node AzureCloudDebugger.js"
+    "test": "echo \"Error: no test specified\" && exit 0",
+    "start": "npm run concat-css && node AzureCloudDebugger.js",
+    "concat-css": "concat -o ./public/styles/index.css ./public/styles/base.css ./public/styles/button.css ./public/styles/form.css ./public/styles/message-containers.css ./public/styles/nav.css"
   },
   "repository": {
     "type": "git",
