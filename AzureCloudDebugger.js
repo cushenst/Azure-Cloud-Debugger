@@ -3,9 +3,14 @@ const {EventHubClient} = require("@azure/event-hubs");
 const express = require('express');
 const http = require('http');
 const WebSocket = require('ws');
+const compression = require('compression');
 
 //create the express app
 const app = express();
+
+//use compression for serving static files
+app.use(compression());
+
 //set the port for the http and webSocket server to listen on
 const port = 3000;
 
@@ -23,9 +28,7 @@ app.get("/", function (req, res) {
 });
 
 //return the css and other static files
-app.get("/static/:page", function (req, res) {
-    res.sendFile(__dirname + "/public/" + req.params["page"]);
-});
+app.use('/static', express.static('public'));
 
 //send status at /health
 app.get("/health", function (req, res) {
