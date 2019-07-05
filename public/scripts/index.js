@@ -90,17 +90,24 @@ $(function WebSockets(firstLoad = true) {
 
                 //insert the new message at the top of the page
 
-                devicesMessagesContainer.insertAdjacentHTML('afterbegin',
-                    '<div class="displaystyle-info message-container">' +
-                    '<table><tr><th style="font-weight: bold">Device:</th><td>' +
-                    String(parsedMessage.Device) +
-                    '</td></tr><tr><th style="font-weight: bold">Topic:</th><td>' +
-                    String(parsedMessage.Topic) +
-                    '</td></tr><tr><th style="font-weight: bold">Message:</th><td>' +
-                    parsedMessage.Payload +
-                    '</td></tr><tr><th style="font-weight: bold">Time:</th><td>' +
-                    String(formattedTime) +
-                    '</td></tr></table></div>');
+                devicesMessagesContainer.insertAdjacentHTML('afterbegin', '<div class="displaystyle-info message-container">' +
+                    '<div>' +
+                    '<label class="output-label">Device:</label>' +
+                    '<label class="output-label-text">' + String(parsedMessage.Device) + '</label>' +
+                    '</div>' +
+                    '<div>' +
+                    '<label class="output-label">Topic:</label>' +
+                    '<label class="output-label-text">' + String(parsedMessage.Topic) + '</label>' +
+                    '</div>' +
+                    '<div>' +
+                    '<label class="output-label">Message:</label>' +
+                    '<label class="output-label-text">' + parsedMessage.Payload + '</label>' +
+                    '</div>' +
+                    '<div>' +
+                    '<label class="output-label">Time:</label>' +
+                    '<label class="output-label-text">' + String(formattedTime) + '</label>' +
+                    '</div>' +
+                    '</div>');
 
             }
 
