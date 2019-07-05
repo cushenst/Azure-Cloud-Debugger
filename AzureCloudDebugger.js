@@ -3,9 +3,14 @@ const {EventHubClient} = require("@azure/event-hubs");
 const express = require('express');
 const http = require('http');
 const WebSocket = require('ws');
+const compression = require('compression');
 
 //create the express app
 const app = express();
+
+//use compression for serving static files
+app.use(compression());
+
 //set the port for the http and webSocket server to listen on
 const port = 3000;
 

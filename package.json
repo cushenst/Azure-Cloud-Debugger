@@ -5,6 +5,7 @@
   "main": "AzureCloudDebugger.js",
   "dependencies": {
     "@azure/event-hubs": "^2.0.0",
+    "compression": "^1.7.4",
     "concat": "^1.0.3",
     "express": "^4.17.0",
     "ws": "^7.0.0"
