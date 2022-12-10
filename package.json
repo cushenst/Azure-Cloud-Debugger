@@ -7,7 +7,7 @@
     "@azure/event-hubs": "^2.0.0",
     "compression": "^1.7.4",
     "concat": "^1.0.3",
-    "express": "^4.17.0",
+    "express": "^4.17.3",
     "ws": "^7.0.0"
   },
   "devDependencies": {},
